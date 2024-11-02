@@ -8,7 +8,7 @@ import {
 import type { IContext, IMember } from '../types.js';
 import { MemberTypeId } from '../../member-types/schemas.js';
 
-export const MemberTypeIdGql = new GraphQLEnumType({
+export const MemberTypeIdGql: GraphQLEnumType = new GraphQLEnumType({
   name: 'MemberTypeId',
   values: {
     [MemberTypeId.BASIC]: { value: MemberTypeId.BASIC },
@@ -16,7 +16,7 @@ export const MemberTypeIdGql = new GraphQLEnumType({
   },
 });
 
-export const MemberTypeGql: GraphQLObjectType<IMember, IContext> = new GraphQLObjectType({
+export const MemberType: GraphQLObjectType<IMember, IContext> = new GraphQLObjectType({
   name: 'MemberType',
   fields: {
     id: { type: new GraphQLNonNull(MemberTypeIdGql) },

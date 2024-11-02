@@ -9,3 +9,10 @@ export interface IMember {
 export interface IContext {
   prisma: PrismaClient;
 }
+
+export interface IPost {
+  id: string;
+  title: string;
+  content: string;
+  authorId: string;
+}
