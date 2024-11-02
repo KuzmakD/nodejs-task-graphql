@@ -25,8 +25,15 @@ export interface IProfile {
   memberTypeId: string;
 }
 
+export interface ISubscribe {
+  subscriberId: string;
+  authorId: string;
+}
+
 export interface IUser {
   id: string;
   name: string;
   balance: number;
+  userSubscribedTo?: ISubscribe[];
+  subscribedToUser?: ISubscribe[];
 }
