@@ -16,7 +16,7 @@ export const MemberTypeIdGql: GraphQLEnumType = new GraphQLEnumType({
   },
 });
 
-export const MemberType: GraphQLObjectType<IMember, IContext> = new GraphQLObjectType({
+export const MemberTypeGql: GraphQLObjectType<IMember, IContext> = new GraphQLObjectType({
   name: 'MemberType',
   fields: {
     id: { type: new GraphQLNonNull(MemberTypeIdGql) },
