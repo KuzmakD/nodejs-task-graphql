@@ -31,6 +31,5 @@ export const ChangePostInputType: GraphQLInputObjectType = new GraphQLInputObjec
   fields: {
     title: { type: GraphQLString },
     content: { type: GraphQLString },
-    authorId: { type: UUIDType },
   },
 });

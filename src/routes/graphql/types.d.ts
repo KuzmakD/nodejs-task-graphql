@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+// import { UUID } from 'node:crypto';
 
 export interface IMember {
   id: string;
@@ -30,10 +31,20 @@ export interface ISubscribe {
   authorId: string;
 }
 
+export interface ISubscribeUpdate {
+  userId: string;
+  authorId: string;
+}
+
 export interface IUser {
   id: string;
   name: string;
   balance: number;
   userSubscribedTo?: ISubscribe[];
   subscribedToUser?: ISubscribe[];
+}
+
+export interface IUserFields {
+  name: string;
+  balance: number;
 }
