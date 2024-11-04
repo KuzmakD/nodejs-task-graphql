@@ -14,47 +14,41 @@ import { PostType } from './post.type.js';
 export const UserType: GraphQLObjectType<IUser, IContext> = new GraphQLObjectType({
   name: 'User',
   fields: () => ({
-    id: { type: new GraphQLNonNull(UUIDType) },
+    id: { type: UUIDType },
     name: { type: GraphQLString },
     balance: { type: GraphQLFloat },
     profile: {
       type: ProfileType,
       async resolve(src, _, context) {
-        return context.prisma.profile.findUnique({ where: { userId: src.id } });
+        return context.loaders.profileByUserId.load(src.id);
       },
     },
     posts: {
       type: new GraphQLList(PostType),
       async resolve(src, _, context) {
-        return context.prisma.post.findMany({ where: { authorId: src.id } });
+        return context.loaders.postsByAuthor.load(src.id);
       },
     },
     userSubscribedTo: {
       type: new GraphQLList(UserType),
       resolve: async (src, __, context) => {
-        const results = await context.prisma.subscribersOnAuthors.findMany({
-          where: {
-            subscriberId: src.id,
-          },
-          select: {
-            author: true,
-          },
-        });
-        return results.map((result) => result.author);
+        const usersSubTo = src.userSubscribedTo || [];
+        const results = await context.loaders.userById.loadMany(
+          usersSubTo.map((userSubTo) => userSubTo.authorId),
+        );
+
+        return results;
       },
     },
     subscribedToUser: {
       type: new GraphQLList(UserType),
       resolve: async (src, __, context) => {
-        const results = await context.prisma.subscribersOnAuthors.findMany({
-          where: {
-            authorId: src.id,
-          },
-          select: {
-            subscriber: true,
-          },
-        });
-        return results.map((result) => result.subscriber);
+        const subsToUser = src.subscribedToUser || [];
+        const results = await context.loaders.userById.loadMany(
+          subsToUser.map((subToUser) => subToUser.subscriberId),
+        );
+
+        return results;
       },
     },
   }),

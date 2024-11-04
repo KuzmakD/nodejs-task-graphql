@@ -1,43 +1,46 @@
 import { PrismaClient } from '@prisma/client';
-// import { UUID } from 'node:crypto';
+import { UUID } from 'node:crypto';
+import { MemberTypeId } from '../member-types/schemas.ts';
+import { dataLoaders } from './loaders.ts';
 
 export interface IMember {
-  id: string;
+  id: `${MemberTypeId}`;
   discount: number;
   postLimitPerMonth: number;
 }
 
 export interface IContext {
   prisma: PrismaClient;
+  loaders: ReturnType<typeof dataLoaders>;
 }
 
 export interface IPost {
-  id: string;
+  id: UUID;
   title: string;
   content: string;
-  authorId: string;
+  authorId: UUID;
 }
 
 export interface IProfile {
-  id: string;
+  id: UUID;
   isMale: boolean;
   yearOfBirth: number;
-  userId: string;
-  memberTypeId: string;
+  userId: UUID;
+  memberTypeId: UUID;
 }
 
 export interface ISubscribe {
-  subscriberId: string;
-  authorId: string;
+  subscriberId: UUID;
+  authorId: UUID;
 }
 
 export interface ISubscribeUpdate {
-  userId: string;
-  authorId: string;
+  userId: UUID;
+  authorId: UUID;
 }
 
 export interface IUser {
-  id: string;
+  id: UUID;
   name: string;
   balance: number;
   userSubscribedTo?: ISubscribe[];

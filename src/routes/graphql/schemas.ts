@@ -4,7 +4,7 @@ import {
   MemberTypeQueries,
   PostQueries,
   ProfileQueries,
-  userQueries,
+  UserQueries,
 } from './queries.js';
 import {
   PostMutations,
@@ -39,7 +39,7 @@ export const gqlSchema = new GraphQLSchema({
       ...MemberTypeQueries,
       ...PostQueries,
       ...ProfileQueries,
-      ...userQueries,
+      ...UserQueries,
     },
   }),
   mutation: new GraphQLObjectType({

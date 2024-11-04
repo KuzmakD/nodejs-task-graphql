@@ -2,7 +2,6 @@ import {
   GraphQLBoolean,
   GraphQLInputObjectType,
   GraphQLInt,
-  GraphQLNonNull,
   GraphQLObjectType,
   GraphQLString,
 } from 'graphql';
@@ -11,27 +10,26 @@ import { UUIDType } from './uuid.js';
 import { MemberType, MemberTypeIdGql } from './member.type.js';
 import { Profile } from '@prisma/client';
 import { UserType } from './user.type.js';
+import { UUID } from 'crypto';
 
 export const ProfileType: GraphQLObjectType<Profile, IContext> = new GraphQLObjectType({
   name: 'Profile',
   fields: () => ({
-    id: { type: new GraphQLNonNull(UUIDType) },
+    id: { type: UUIDType },
     isMale: { type: GraphQLBoolean },
     yearOfBirth: { type: GraphQLInt },
     userId: { type: UUIDType },
-    memberTypeId: { type: GraphQLString },
+    memberTypeId: { type: UUIDType },
     user: {
       type: UserType,
-      async resolve(src, _, context) {
-        return context.prisma.user.findUnique({ where: { id: src.userId } });
+      async resolve(src, _, ctx) {
+        return ctx.loaders.userById.load(src.userId as UUID);
       },
     },
     memberType: {
       type: MemberType,
       resolve: async (src, _, context) => {
-        return context.prisma.memberType.findUnique({
-          where: { id: src.memberTypeId },
-        });
+        return context.loaders.memberType.load(src.memberTypeId);
       },
     },
   }),

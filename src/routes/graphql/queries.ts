@@ -6,13 +6,18 @@ import { IContext } from './types.js';
 import { type UUID } from 'node:crypto';
 import { ProfileType } from './types/profile.type.js';
 import { PostType } from './types/post.type.js';
+import {
+  ResolveTree,
+  parseResolveInfo,
+  simplifyParsedResolveInfoFragmentWithType as simplifyResolve,
+} from 'graphql-parse-resolve-info';
 
 export const MemberTypeQueries = {
   memberType: {
     type: MemberType,
     args: { id: { type: MemberTypeIdGql } },
     async resolve(_, { id }, context) {
-      return context.prisma.memberType.findUnique({ where: { id } });
+      return context.loaders.memberType.load(id);
     },
   },
   memberTypes: {
@@ -26,18 +31,32 @@ export const MemberTypeQueries = {
   memberTypes: GraphQLFieldConfig<void, IContext>;
 };
 
-export const userQueries = {
+export const UserQueries = {
   user: {
     type: UserType,
     args: { id: { type: UUIDType } },
     async resolve(_, { id }, context) {
-      return context.prisma.user.findUnique({ where: { id } });
+      return context.loaders.userById.load(id);
     },
   },
   users: {
     type: new GraphQLList(UserType),
-    async resolve(_, __, context) {
-      return context.prisma.user.findMany();
+    async resolve(_, __, context, data) {
+      const resolveInfo = simplifyResolve(
+        parseResolveInfo(data) as ResolveTree,
+        new GraphQLList(UserType),
+      );
+      const users = await context.prisma.user.findMany({
+        include: {
+          userSubscribedTo: Boolean(resolveInfo.fields['userSubscribedTo']),
+          subscribedToUser: Boolean(resolveInfo.fields['subscribedToUser']),
+        },
+      });
+
+      users.forEach((user) => {
+        context.loaders.userById.prime(user.id as UUID, user);
+      });
+      return users;
     },
   },
 } satisfies {
@@ -50,7 +69,7 @@ export const ProfileQueries = {
     type: ProfileType,
     args: { id: { type: UUIDType } },
     async resolve(_, { id }, context) {
-      return context.prisma.profile.findUnique({ where: { id } });
+      return context.loaders.profileById.load(id);
     },
   },
   profiles: {
@@ -69,7 +88,7 @@ export const PostQueries = {
     type: PostType,
     args: { id: { type: UUIDType } },
     async resolve(_, { id }, context) {
-      return context.prisma.post.findUnique({ where: { id } });
+      return context.loaders.postById.load(id);
     },
   },
   posts: {
